@@ -4,6 +4,7 @@ clc;clear;clf;
 levels = [4 8 12 16];
 level_counter = [160 160 160 160];
 sess_data = ["Trial" "Size" "User_Time" "User_Input"];
+session_pauser = 100;
 
 %%%% TRIAL PARAMETERS %%%%%
 types = ["Pop-out" "Conjunction" "No-target"];
@@ -36,7 +37,7 @@ for i=1:640
     curr_trial = randsample(types, 1, true, curr_level_counts/sum(curr_level_counts));
     % Reduce chosen trial number by 1
     curr_level_counts(find(types == curr_trial)) = curr_level_counts(find(types == curr_trial)) - 1;
-    trial_counts(3, :) = curr_level_counts;
+    trial_counts(curr_level_index, :) = curr_level_counts;
 
     % Clear and focus user with center X
     plot_controller("Focus", curr_level)
@@ -47,7 +48,7 @@ for i=1:640
     sess_data = [sess_data; curr_trial curr_level trial_time trial_input];
     
     % A break every 100 trials
-    if mod(i, 100) == 0
+    if mod(i, session_pauser) == 0
         clf;
         g = text (0.3, 0.5, string(640 - i) + " trials remaining, enter to continue");
         % When enter pressed, this while will end
