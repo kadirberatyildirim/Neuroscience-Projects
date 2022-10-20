@@ -55,6 +55,6 @@ function plot_controller(type, size)
         s = scatter(2.5, 2.5, 200, "black", "linewidth", 2);
         s.Marker = 'x';
         axis off;
-        pause(0.5) % Sleep half second to make person look on the dot
+        pause(1) % Sleep half second to make person look on the dot
     end
 end
