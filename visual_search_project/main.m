@@ -15,7 +15,7 @@ clf;
 % To make figure fullscreen, uncomment next line!
 figure('units','normalized','outerposition',[0 0 1 1])
 % A text before starting trial
-g = text (0.5, 0.5, "Press enter to start trials");
+g = text (0.3, 0.5, "Press enter to start trials");
 % When enter pressed, this while will end
 inp = get_input;
 while inp ~= 13
@@ -43,8 +43,19 @@ for i=1:640
 
     % Run trial
     [trial_time, trial_input] = trial(curr_trial, curr_level);
-
+    % Save data
     sess_data = [sess_data; curr_trial curr_level trial_time trial_input];
+    
+    % A break every 100 trials
+    if mod(i, 100) == 0
+        clf;
+        g = text (0.3, 0.5, string(640 - i) + " trials remaining, enter to continue");
+        % When enter pressed, this while will end
+        inp = get_input;
+        while inp ~= 13
+            inp = get_input;
+        end
+    end
 end
 
 % Save trial data
