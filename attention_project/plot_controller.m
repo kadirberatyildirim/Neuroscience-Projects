@@ -12,6 +12,7 @@ function plot_controller(type, bounds, point)
         s = scatter((2*point(1)+length(bounds))/2, (2*point(2)+length(bounds))/2, ...
             800, "red", 'filled');
     end
+    hold off
 end
 
 % Every plot will contain grids
