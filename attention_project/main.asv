@@ -9,6 +9,7 @@ loc_counts = repmat(num_trials/grid_size, [grid_size/2 grid_size/2 grid_size^2])
 types = ["Valid-100" "Valid-300"; 
         "Invalid-100" "Invalid-300"]; % This is the structure of loc_counts
 total_trials = num_trials*grid_size^2;
+data = ["Trial" "Subject_Time"];
 
 %%%%% Preadjustments %%%%%
 % To make figure fullscreen, uncomment next line!
@@ -23,8 +24,8 @@ for i=1:total_trials
     % Choose a random trial type
     trial_weights = reshape(curr_loc_matrix,1,[])/sum(sum(curr_loc_matrix));
     curr_trial = randsample(reshape(types, 1, []), 1, true, trial_weights);
-    
-
+    % Find plot point
+    cue_point = find_plot_point(loc, points, bounds, grid_size);
     % Split trial type string for deciding target times and location
     type = split(curr_trial, "-");
     
@@ -36,15 +37,17 @@ for i=1:total_trials
             pause(str2double(type(2))/10^3)
             clf;
             plot_controller("Target", bounds, cue_point)
-            input_handler;
         case "Invalid"
             plot_controller("Cue", bounds, cue_point)
             pause(str2double(type(2))/10^3)
-            new_loc = choose_loc(loc_counts, points, 0, loc)
+            new_loc = choose_loc(loc_counts, points, 0, loc);
+            target_point = find_plot_point(new_loc, points, bounds, grid_size);
             clf;
-            plot_controller("Target", bounds, cue_point)
-            input_handler;
+            plot_controller("Target", bounds, target_point)
     end
+    
+    % Time subject
+    user_times(end+1,:) = input_handler;
 
     % Reduce chosen trials count by 1
     trial_index = find(types==curr_trial);
@@ -57,7 +60,7 @@ for i=1:total_trials
 end
 
 %%%%% HELPER FUNCTIONS %%%%%
-function [time, answer] = input_handler
+function [time] = input_handler
     tic
 
     % space: 32, enter: 13

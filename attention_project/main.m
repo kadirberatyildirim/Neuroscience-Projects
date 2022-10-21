@@ -9,6 +9,7 @@ loc_counts = repmat(num_trials/grid_size, [grid_size/2 grid_size/2 grid_size^2])
 types = ["Valid-100" "Valid-300"; 
         "Invalid-100" "Invalid-300"]; % This is the structure of loc_counts
 total_trials = num_trials*grid_size^2;
+data = ["Trial" "Subject_Time"];
 
 %%%%% Preadjustments %%%%%
 % To make figure fullscreen, uncomment next line!
@@ -17,7 +18,7 @@ figure('units','normalized','outerposition',[0 0 1 1])
 %%%%% Session %%%%%
 for i=1:total_trials
     % Choose a random location on grid
-    loc = choose_loc(loc_counts, points, 0, 0)
+    loc = choose_loc(loc_counts, points, 0, 0);
     % Save that location's trial matrix
     curr_loc_matrix = loc_counts(:,:,loc);
     % Choose a random trial type
@@ -36,7 +37,6 @@ for i=1:total_trials
             pause(str2double(type(2))/10^3)
             clf;
             plot_controller("Target", bounds, cue_point)
-            input_handler;
         case "Invalid"
             plot_controller("Cue", bounds, cue_point)
             pause(str2double(type(2))/10^3)
@@ -44,8 +44,10 @@ for i=1:total_trials
             target_point = find_plot_point(new_loc, points, bounds, grid_size);
             clf;
             plot_controller("Target", bounds, target_point)
-            input_handler;
     end
+    
+    % Time subject
+    user_time = input_handler;
 
     % Reduce chosen trials count by 1
     trial_index = find(types==curr_trial);
@@ -53,12 +55,18 @@ for i=1:total_trials
     % Overwrite 3D counts matrix with the new matrix of the trial
     loc_counts(:,:,loc) = curr_loc_matrix;
 
+    % Store Data
+    data = [data; curr_trial user_time];
+
     % Remaining trials can be shown by uncommenting next line
-    disp("Remaining trials: " + string(sum(reshape(sum(sum(loc_counts), 2), 1, []))))
+    %disp("Remaining trials: " + string(sum(reshape(sum(sum(loc_counts), 2), 1, []))))
 end
 
+% Save trial data
+writematrix(data, string(datetime()) + "_session_data.csv")
+
 %%%%% HELPER FUNCTIONS %%%%%
-function [time, answer] = input_handler
+function [time] = input_handler
     tic
 
     % space: 32, enter: 13
