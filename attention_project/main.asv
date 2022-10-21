@@ -17,26 +17,14 @@ figure('units','normalized','outerposition',[0 0 1 1])
 %%%%% Session %%%%%
 for i=1:total_trials
     % Choose a random location on grid
-    loc_remaining = reshape(sum(sum(loc_counts), 2), 1, []);
-    loc_weights = loc_remaining/sum(loc_remaining);
-    loc = randsample(reshape(points, 1, []), 1, true, loc_weights);
+    loc = choose_loc(loc_counts, points, 0, 0)
     % Save that location's trial matrix
     curr_loc_matrix = loc_counts(:,:,loc);
     % Choose a random trial type
     trial_weights = reshape(curr_loc_matrix,1,[])/sum(sum(curr_loc_matrix));
     curr_trial = randsample(reshape(types, 1, []), 1, true, trial_weights);
-    % Reduce chosen trials count by 1
-    trial_index = find(types==curr_trial);
-    curr_loc_matrix(trial_index) = curr_loc_matrix(trial_index) - 1;
-    % Overwrite 3D counts matrix with the new matrix of the trial
-    loc_counts(:,:,loc) = curr_loc_matrix;
     
-    %{ 
-    Calculate plot location, this is needed bc 'points' array's origin is
-    top left while plot grid's origin is bottom left.
-    %}
-    [row, column] = find(points == loc);
-    cue_point = [grid_size*(column-1) bounds(end)-(grid_size*(row-1))];
+
     % Split trial type string for deciding target times and location
     type = split(curr_trial, "-");
     
@@ -46,14 +34,26 @@ for i=1:total_trials
         case "Valid"
             plot_controller("Cue", bounds, cue_point)
             pause(str2double(type(2))/10^3)
+            clf;
             plot_controller("Target", bounds, cue_point)
-            input_handler
+            input_handler;
         case "Invalid"
             plot_controller("Cue", bounds, cue_point)
             pause(str2double(type(2))/10^3)
+            new_loc = choose_loc(loc_counts, points, 0, loc)
+            clf;
             plot_controller("Target", bounds, cue_point)
-            input_handler
+            input_handler;
     end
+
+    % Reduce chosen trials count by 1
+    trial_index = find(types==curr_trial);
+    curr_loc_matrix(trial_index) = curr_loc_matrix(trial_index) - 1;
+    % Overwrite 3D counts matrix with the new matrix of the trial
+    loc_counts(:,:,loc) = curr_loc_matrix;
+
+    % Remaining trials can be shown by uncommenting next line
+    disp("Remaining trials: " + string(sum(reshape(sum(sum(loc_counts), 2), 1, []))))
 end
 
 %%%%% HELPER FUNCTIONS %%%%%
@@ -65,4 +65,28 @@ function [time, answer] = input_handler
     answer = double(get(gcf,'CurrentCharacter'));
     
     time = toc;
+end
+
+function loc = choose_loc(loc_counts, points, nonintersecting, old_loc)
+    loc_remaining = reshape(sum(sum(loc_counts), 2), 1, []);
+    loc_weights = loc_remaining/sum(loc_remaining);
+    if ~(nonintersecting)
+        loc = randsample(reshape(points, 1, []), 1, true, loc_weights);
+    elseif nonintersecting
+        while 1
+            loc = randsample(reshape(points, 1, []), 1, true, loc_weights);
+            if loc ~= old_loc
+                break
+            end
+        end
+    end
+end
+
+function plot_point = find_plot_point(loc, points, bounds, grid_size)
+    %{ 
+    Calculate plot location, this is needed bc 'points' array's origin is
+    top left while plot grid's origin is bottom left.
+    %}
+    [row, column] = find(points == loc);
+    plot_point = [grid_size*(column-1) bounds(end)-(grid_size*(row-1))];
 end
