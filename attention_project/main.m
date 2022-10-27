@@ -14,6 +14,13 @@ data = ["Trial" "Subject_Time"];
 %%%%% Preadjustments %%%%%
 % To make figure fullscreen, uncomment next line!
 figure('units','normalized','outerposition',[0 0 1 1])
+% A text before starting trial
+g = text (0.3, 0.5, "Press enter to start trials");
+% When enter pressed, this while will end
+inp = get_input;
+while inp ~= 13
+    inp = get_input;
+end
 
 %%%%% Session %%%%%
 for i=1:total_trials
@@ -74,6 +81,11 @@ function [time] = input_handler
     answer = double(get(gcf,'CurrentCharacter'));
     
     time = toc;
+end
+
+function inp = get_input
+    k = waitforbuttonpress;
+    inp = double(get(gcf,'CurrentCharacter'));
 end
 
 function loc = choose_loc(loc_counts, points, nonintersecting, old_loc)
