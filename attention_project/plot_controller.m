@@ -1,4 +1,5 @@
 function plot_controller(type, bounds, point)
+    clf;
     % Plot the background grids
     plot_grids(bounds)
     hold on

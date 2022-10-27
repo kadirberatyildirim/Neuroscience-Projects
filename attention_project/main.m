@@ -10,6 +10,7 @@ types = ["Valid-100" "Valid-300";
         "Invalid-100" "Invalid-300"]; % This is the structure of loc_counts
 total_trials = num_trials*grid_size^2;
 data = ["Trial" "Subject_Time"];
+pause_btw_events = 1; % In seconds
 
 %%%%% Preadjustments %%%%%
 % To make figure fullscreen, uncomment next line!
@@ -36,8 +37,12 @@ for i=1:total_trials
     % Split trial type string for deciding target times and location
     type = split(curr_trial, "-");
     
-    % Plot
+    % Empty plot before the event, so that events are not shown too fast
     clf;
+    plot_controller("", bounds, cue_point)
+    pause(pause_btw_events)
+
+    % Plot
     switch type(1)
         case "Valid"
             plot_controller("Cue", bounds, cue_point)
