@@ -59,7 +59,7 @@ sp2 = subplot(2,1,2);
 target_means = (pop_means + conj_means)/2;
 plot(set_sizes, no_means)
 hold on
-plot(set_sizes, target_means)sp1
+plot(set_sizes, target_means)
 %ylim([0.5 0.8])
 legend("No-target", "Target")
 xlabel("Set size")
