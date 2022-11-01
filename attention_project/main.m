@@ -9,7 +9,7 @@ loc_counts = repmat(num_trials/grid_size, [grid_size/2 grid_size/2 grid_size^2])
 types = ["Valid-100" "Valid-300"; 
         "Invalid-100" "Invalid-300"]; % This is the structure of loc_counts
 total_trials = num_trials*grid_size^2;
-data = ["Trial" "Subject_Time"];
+data = ["Trial" "Subject_Time" "Subject_Answer" "Cue_Pos" "Target_Pos"];
 pause_btw_events = 1; % In seconds
 
 %%%%% Preadjustments %%%%%
@@ -36,12 +36,12 @@ for i=1:total_trials
     cue_point = find_plot_point(loc, points, bounds, grid_size);
     % Split trial type string for deciding target times and location
     type = split(curr_trial, "-");
-    
+    %{
     % Empty plot before the event, so that events are not shown too fast
     clf;
-    plot_controller("", bounds, cue_point)
+    scatter(8,8,450,'+','black')
     pause(pause_btw_events)
-
+    %}
     % Plot
     switch type(1)
         case "Valid"
@@ -59,7 +59,7 @@ for i=1:total_trials
     end
     
     % Time subject
-    user_time = input_handler;
+    [user_time, user_answer] = input_handler;
 
     % Reduce chosen trials count by 1
     trial_index = find(types==curr_trial);
@@ -68,7 +68,13 @@ for i=1:total_trials
     loc_counts(:,:,loc) = curr_loc_matrix;
 
     % Store Data
-    data = [data; curr_trial user_time];
+    cue_entry = string(cue_point(1)) + "," + string(cue_point(2));
+    if type(1) == "Valid"
+        data = [data; curr_trial user_time user_answer cue_entry cue_entry];
+    elseif type(1) == "Invalid"
+        targ_entry = string(target_point(1)) + "," + string(target_point(2));
+        data = [data; curr_trial user_time user_answer cue_entry targ_entry];
+    end
 
     % Remaining trials can be shown by uncommenting next line
     %disp("Remaining trials: " + string(sum(reshape(sum(sum(loc_counts), 2), 1, []))))
@@ -78,7 +84,7 @@ end
 writematrix(data, string(datetime()) + "_session_data.csv")
 
 %%%%% HELPER FUNCTIONS %%%%%
-function [time] = input_handler
+function [time, answer] = input_handler
     tic
 
     % space: 32, enter: 13
@@ -86,8 +92,17 @@ function [time] = input_handler
     answer = double(get(gcf,'CurrentCharacter'));
     
     time = toc;
-end
 
+    switch answer
+        case 13
+            answer = "Valid";
+        case 32
+            answer = "Invalid";
+        otherwise
+            answer = "Unknown_Input";
+    end
+end
+% Input for enter skipping -> returns ASCII char of input
 function inp = get_input
     k = waitforbuttonpress;
     inp = double(get(gcf,'CurrentCharacter'));
