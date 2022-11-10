@@ -1,5 +1,5 @@
 clc;clear;clf;
-
+% Random locs inside grids, cue disappears, limit target time
 %%%%% PARAMETERS %%%%%
 num_trials = 80; % For each location
 grid_size = 4; % One dimension of the grid, choose even nums
@@ -11,6 +11,7 @@ types = ["Valid-100" "Valid-300";
 total_trials = num_trials*grid_size^2;
 data = ["Trial" "Subject_Time" "Subject_Answer" "Cue_Pos" "Target_Pos"];
 pause_btw_events = 1; % In seconds
+session_pauser = 100;
 
 %%%%% Preadjustments %%%%%
 % To make figure fullscreen, uncomment next line!
@@ -25,6 +26,9 @@ end
 
 %%%%% Session %%%%%
 for i=1:total_trials
+    % Focus subject to middle
+    focus_plot
+    pause(0.5)
     % Choose a random location on grid
     loc = choose_loc(loc_counts, points, 0, 0);
     % Save that location's trial matrix
@@ -36,26 +40,33 @@ for i=1:total_trials
     cue_point = find_plot_point(loc, points, bounds, grid_size);
     % Split trial type string for deciding target times and location
     type = split(curr_trial, "-");
-    %{
-    % Empty plot before the event, so that events are not shown too fast
-    clf;
-    scatter(8,8,450,'+','black')
-    pause(pause_btw_events)
-    %}
+    cue_point = [(2*cue_point(1)+length(bounds))/2 (2*cue_point(2)+length(bounds))/2];
+    cue_point = noise(cue_point);
+
     % Plot
     switch type(1)
         case "Valid"
             plot_controller("Cue", bounds, cue_point)
+            pause(0.2)
+            empty_plot
             pause(str2double(type(2))/10^3)
             clf;
             plot_controller("Target", bounds, cue_point)
+            pause(0.2)
+            empty_plot
         case "Invalid"
             plot_controller("Cue", bounds, cue_point)
+            pause(0.2)
+            empty_plot
             pause(str2double(type(2))/10^3)
             new_loc = choose_loc(loc_counts, points, 0, loc);
             target_point = find_plot_point(new_loc, points, bounds, grid_size);
+            target_point = [(2*target_point(1)+length(bounds))/2 (2*target_point(2)+length(bounds))/2];
+            target_point = noise(target_point);
             clf;
             plot_controller("Target", bounds, target_point)
+            pause(0.2)
+            empty_plot
     end
     
     % Time subject
@@ -74,6 +85,18 @@ for i=1:total_trials
     elseif type(1) == "Invalid"
         targ_entry = string(target_point(1)) + "," + string(target_point(2));
         data = [data; curr_trial user_time user_answer cue_entry targ_entry];
+    end
+    
+    
+    % A break every 100 trials
+    if mod(i, session_pauser) == 0
+        clf;
+        g = text (0.3, 0.5, string(1280 - i) + " trials remaining, enter to continue");
+        % When enter pressed, this while will end
+        inp = get_input;
+        while inp ~= 13
+            inp = get_input;
+        end
     end
 
     % Remaining trials can be shown by uncommenting next line
@@ -130,4 +153,24 @@ function plot_point = find_plot_point(loc, points, bounds, grid_size)
     %}
     [row, column] = find(points == loc);
     plot_point = [grid_size*(column-1) bounds(end)-(grid_size*(row-1))];
+end
+
+function focus_plot
+    s = scatter(8, 8, ...
+            200, "+", "black");
+    xlim([0 16])
+    ylim([0 16])
+    axis off
+end
+
+function empty_plot
+    clf;
+    xlim([0 16])
+    ylim([0 16])
+    axis off
+end
+
+% Noise to move the point inside the grid
+function [noised] = noise(point)
+    noised = [point(1)+rand()*4-2 point(2)+rand()*4-2];
 end
