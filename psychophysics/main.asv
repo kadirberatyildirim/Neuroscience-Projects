@@ -1,0 +1,3 @@
+clc; clear; clf;
+
+trials = ['Fovial', 'Parafovial', 'RGB']
