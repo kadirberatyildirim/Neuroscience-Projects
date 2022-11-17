@@ -31,10 +31,12 @@ end
 
 %%%%% Relative experiment %%%%%
 for i = 2:3
-    pause_text = "You will be starting relative trial with distance " + string(dist) + ". Focus on the center and decide if right dot is dimmer or brighter than the left dot.";
-    pause_figure(pause_text)
-    s = trial(h, dists(i), [1 2 3], dists(i));
-    scores = [scores; colours(i)+"-"+string(dists(j)) transpose(s)];
+    for b = [40 50]
+        pause_text = "You will be starting relative trial with distance " + string(dist) + ". Focus on the center and decide if right dot is dimmer or brighter than the left dot.";
+        pause_figure(pause_text)
+        s = trial(h, dists(i), [1 2 3], b);
+        scores = [scores; colours(i)+"-"+string(dists(j))+"-"+string(b) transpose(s)];
+    end
 end
 
 % Save trial data

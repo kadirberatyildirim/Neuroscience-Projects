@@ -4,7 +4,7 @@ function score = trial(h, dist, color, rel)
     for ii = 1:10 %Filling temp1
         if dist ~= 0; temp(200,200,:) = 255; end %Inserting a fixation point
         temp(200,200+dist,color) = (ii-1)*10; %Inserting a test point dist pixels right of it. Brightness range 0 to 90.
-        if rel ~= 0; temp(200,200-dist,color) = rel; end
+        if rel ~= 0; temp(200,200-dist,color) = rel; end % If there is a relative distance needed, plot it
         temp1{ii} = temp; %Putting the respective modified matrix in cell
     end %Done doing that
     %h = figure('units','normalized','outerposition',[0 0 1 1]) %Creating a figure with a handle h
