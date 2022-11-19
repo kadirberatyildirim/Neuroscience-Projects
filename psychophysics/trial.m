@@ -20,6 +20,6 @@ function score = trial(h, dist, color, rel)
         pause; %Get the keypress
         temp2 = get(h,'CurrentCharacter'); %Get the keypress. =." for present, “,” for absent.
         temp3 = strcmp('.', temp2); %Compare strings. If . (present), temp3 = 1, otherwise 0.
-        score(stimulusorder(1,ii)) = score(stimulusorder(1,ii)) + temp3; %Add up. In the respective score sheet.
+        score(stimulusorder(1,ii)) = score(stimulusorder(1,ii)) + temp3 %Add up. In the respective score sheet.
     end %End the presentation of trials, after 200 have lapsed.
 end
