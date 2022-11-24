@@ -29,16 +29,6 @@ for i = 1:3 % In order, R, G and B trials are done this way
     end
 end
 
-%%%%% Relative experiment %%%%%
-for i = 2:3
-    for b = [40 50] % b is the brightness of relative dot
-        pause_text = "You will be starting relative trial with distance " + string(dist) + ". Focus on the center and decide if right dot is dimmer or brighter than the left dot.";
-        pause_figure(pause_text)
-        s = trial(h, dists(i), [1 2 3], b);
-        scores = [scores; "R-"+string(dists(i))+"-"+string(b) transpose(s)];
-    end
-end
-
 % Save trial data
 writematrix(scores, string(datetime()) + "_session_data.csv")
 
