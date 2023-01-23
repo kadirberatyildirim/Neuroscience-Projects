@@ -1,0 +1,6 @@
+PCA will be used to classify neurons in the unsorted spike data.
+- The first thing we could do (before pca) is taking windows of amplitude.
+- For a given ml algorithm, we could use as many features as there are data points.
+So 15 data points, we could have 15 dimensionality, but would not be interesting and would take too much time.
+For example take a robotic arm, where we get signal from brain in real time and we need to classify neurons in real time
+then computing power is important, as well as how hard it is to compute. So we want to reduce the dimension with pca.
