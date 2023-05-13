@@ -1,0 +1,93 @@
+
+set curr_dir = $cwd
+
+# Folders to be preprocessed
+set data_path = $curr_dir/data # !!!Enter your data folder here!!!
+set subfolders = (sub-4872) # !!!Enter subfolder names here in the array!!!
+
+# Tasks
+set tasks = (Words Phrases GoalAchievement)
+
+# Set your naming conventions here. You can use %s if needed (for ex. if task is written in the middle)
+set anat_name_conv = _T1w.nii.gz
+set epi_name_conv = "_task-%s_run-01_bold.nii.gz"
+
+# Other variables
+set mni_template = $curr_dir/MNI152_2009_template_SSW.nii.gz
+
+# Create an output folder to store all files
+mkdir -p $curr_dir/data_preprocessed
+set output_folder = $curr_dir/data_preprocessed
+
+foreach folder ($subfolders)
+	set anat_file = $data_path/$folder/anat/$folder$anat_name_conv # Change for your own file
+	echo Starting preprocessing anatomical file:
+	echo "\t" $anat_file
+
+	# =====Preprocess anatomical file and copy desired outputs=====
+	#source $curr_dir/non_lin_warp.simple $folder $anat_file $mni_template
+	setenv AFNI_DONT_LOGFILE YES
+	setenv AFNI_VERSION_CHECK NO
+	setenv AFNI_COMPRESSOR NONE
+
+	mkdir -p $curr_dir/anat_warped
+	cd $curr_dir/anat_warped
+	mkdir -p tmp_$folder
+	cp $anat_file tmp_$folder
+	cd tmp_$folder
+	@SSwarper -input `basename $anat_file` -subid $folder -base $mni_template
+	gzip -1v *.nii # Compress outputs
+	\mv -f anatSS.${folder}.nii.gz anatQQ.${folder}.nii.gz \
+		anatQQ.${folder}.aff12.1D anatQQ.${folder}_WARP.nii.gz \
+		$curr_dir/anat_warped
+	cd ..
+	\rm -rf temp_$subj
+
+	mkdir -p $output_folder/$folder # Open subject's folder under output folder
+	set curr_output_folder = $output_folder/$folder
+	cp $curr_dir/anat_warped/* $curr_output_folder
+	echo Copied anat files to output folder: $curr_output_folder
+
+	foreach task ($tasks)
+		set epi_file = $data_path/$folder/func/$folder`printf $epi_name_conv $task`
+		echo Starting preprocessing epi file:
+		echo "\t" $epi_file
+
+		# =====Preprocess epi file and move desired outputs=====
+		set warpdir = $curr_dir/anat_warped
+		set epi_outputdir = ${folder}_${task}
+
+		afni_proc.py -subj_id $epi_outputdir \
+			-script proc${folder}${task}.data -scr_overwrite \
+			-blocks despike tshift align tlrc volreg blur mask scale regress \
+			-copy_anat $warpdir/anatSS.$folder.nii.gz \
+			-dsets $epi_file  \
+			-tlrc_base $mni_template \
+			-tlrc_NL_warp \
+			-tlrc_NL_warped_dsets \
+			$warpdir/anatQQ.$folder.nii.gz \
+			$warpdir/anatQQ.$folder.aff12.1D \
+			$warpdir/anatQQ.${folder}_WARP.nii.gz \
+			-tcat_remove_first_trs 4 \
+			-volreg_align_to first    \
+			-align_opts_aea -check_flip -giant_move \
+			-volreg_align_e2a              \
+			-volreg_tlrc_warp \
+			-mask_epi_anat yes \
+			-blur_size 3.0        \
+			-regress_censor_motion 0.2 \
+			-regress_est_blur_errts \
+			-html_review_style pythonic \
+			-execute
+
+		set epi_outputs = ${curr_dir}/anat_warped/${folder}_${task}.results
+		mv $epi_outputs/pb05.* $curr_output_folder
+		mv $epi_outputs/anat_final* $curr_output_folder
+		mv $epi_outputs/full_mask* $curr_output_folder
+		mv $epi_outputs/mask_epi_anat* $curr_output_folder
+		echo Preprocessing $folder is done!
+	end
+
+	# Remove the temporary folders before starting the next folder
+	rm -rf $curr_dir/anat_warped
+end
