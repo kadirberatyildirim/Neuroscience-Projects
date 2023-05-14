@@ -1,3 +1,7 @@
+# Will require the MNI template in the same folder
+# Preprocesses first the anatomical data, then epi data for each task
+# Adjust below for your folder structure
+
 
 set curr_dir = $cwd
 
