@@ -3,7 +3,7 @@ set curr_dir = $cwd
 
 # Folders to be preprocessed
 set data_path = $curr_dir/data # !!!Enter your data folder here!!!
-set subfolders = (sub-4872) # !!!Enter subfolder names here in the array!!!
+set subfolders = (sub-4873 sub-4874 sub-4875 sub-4876 sub-4877 sub-4878 sub-4879 sub-4880 sub-4881) # !!!Enter subfolder names here in the array!!!
 
 # Tasks
 set tasks = (Words Phrases GoalAchievement)
@@ -25,14 +25,13 @@ foreach folder ($subfolders)
 	echo "\t" $anat_file
 
 	# =====Preprocess anatomical file and copy desired outputs=====
-	#source $curr_dir/non_lin_warp.simple $folder $anat_file $mni_template
 	setenv AFNI_DONT_LOGFILE YES
 	setenv AFNI_VERSION_CHECK NO
 	setenv AFNI_COMPRESSOR NONE
 
 	mkdir -p $curr_dir/anat_warped
 	cd $curr_dir/anat_warped
-	mkdir -p tmp_$folder
+	mkdir -p tmp_$folder # Create a temp folder to store everything
 	cp $anat_file tmp_$folder
 	cd tmp_$folder
 	@SSwarper -input `basename $anat_file` -subid $folder -base $mni_template
@@ -41,7 +40,7 @@ foreach folder ($subfolders)
 		anatQQ.${folder}.aff12.1D anatQQ.${folder}_WARP.nii.gz \
 		$curr_dir/anat_warped
 	cd ..
-	\rm -rf temp_$subj
+	\rm -rf tmp_$folder # Remove temp folder
 
 	mkdir -p $output_folder/$folder # Open subject's folder under output folder
 	set curr_output_folder = $output_folder/$folder
@@ -89,5 +88,6 @@ foreach folder ($subfolders)
 	end
 
 	# Remove the temporary folders before starting the next folder
+	cd ..
 	rm -rf $curr_dir/anat_warped
 end
