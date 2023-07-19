@@ -1,2 +1,2 @@
 # Neuroscience-Projects
-This repository includes some projects from the book 'MATLAB for Neuroscientists. An Introduction to Scientific Computing', written in MATLAB.
+This repository includes small scripts from various studies such as master's courses or self-projects.
