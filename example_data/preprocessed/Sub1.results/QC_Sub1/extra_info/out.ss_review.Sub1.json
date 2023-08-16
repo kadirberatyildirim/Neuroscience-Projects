@@ -1,0 +1,68 @@
+{
+    "subject ID": "Sub1",
+    "AFNI version": "AFNI_23.0.07",
+    "AFNI package": "linux_ubuntu_16_64",
+    "TR": "2.5",
+    "TRs removed (per run)": "4",
+    "multiband level": "1",
+    "slice timing pattern": "simult",
+    "num stim classes provided": "0",
+    "final anatomy dset": "anat_final.Sub1+tlrc.HEAD",
+    "final stats dset": "NO_STATS",
+    "final errts dset": "errts.Sub1.tproject+tlrc.HEAD",
+    "orig voxel counts": [
+        "64",
+        "64",
+        "43"
+    ],
+    "orig voxel resolution": [
+        "3.000000",
+        "3.000000",
+        "3.000000"
+    ],
+    "orig volume center": [
+        "-0.825317",
+        "-18.367493",
+        "27.662651"
+    ],
+    "final voxel resolution": [
+        "3.000000",
+        "3.000000",
+        "3.000000"
+    ],
+    "motion limit": "0.2",
+    "num TRs above mot limit": "0",
+    "average motion (per TR)": "0.0293192",
+    "average censored motion": "0.0293192",
+    "max motion displacement": "0.460525",
+    "max censored displacement": "0.460525",
+    "average outlier frac (TR)": "0.00145392",
+    "flip guess": "NO_FLIP",
+    "num runs found": "1",
+    "num TRs per run": "102",
+    "num TRs per run (applied)": "102",
+    "num TRs per run (censored)": "0",
+    "fraction censored per run": "0",
+    "TRs total (uncensored)": "102",
+    "TRs total": "102",
+    "degrees of freedom used": "9",
+    "degrees of freedom left": "93",
+    "final DF fraction": "0.911765",
+    "TRs censored": "0",
+    "censor fraction": "0.000000",
+    "num regs of interest": "0",
+    "TSNR average": "132.289",
+    "global correlation (GCOR)": "0.0100648",
+    "anat/EPI mask Dice coef": "0.925443",
+    "anat/templ mask Dice coef": "0.965596",
+    "blur estimates (ACF)": [
+        "0.903035",
+        "2.40891",
+        "12.8958"
+    ],
+    "blur estimates (FWHM)": [
+        "0",
+        "0",
+        "0"
+    ]
+}
